@@ -2,6 +2,10 @@
 
 ## Link para consumir informacion de mi perfil 
 
+Aquí encontrarás una mejora en la forma en que se utiliza el array para mostrar la información de InfoJobs. Ahora las habilidades están separadas en una sección aparte, creada mediante una consulta que me permite extraer las habilidades del perfil.
+
+Esta mejora permite una mejor organización y visualización de las habilidades específicas de cada perfil en InfoJobs.
+
 URL: [https://api-infojobs.hop.sh/filtradoSkill](https://api-infojobs.hop.sh/filtradoSkill)
 
 ![image](https://github.com/Jucamhc/api-infojobs-hackathon/assets/54044345/8aeb6e81-00ec-4633-bdc2-92a494224483)
