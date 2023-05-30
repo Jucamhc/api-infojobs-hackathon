@@ -10,7 +10,7 @@ const myHeaders = {
 }
 
 const requestOptions = {
-   
+
 };
 
 
@@ -20,15 +20,16 @@ app.use(cors());
 app.get('/', (req, res) => {
 
     res.send("<h1> API INFOJOBS </h1>" +
-    "<p>" +
-    "<h2>/filtradoSkill</h2>" +
-    "Encontraras el array de mi hoja de vida y al final hay un clave con el nombre filtradoSkill con todos </p> <p> los skill de empleos y skill puestos en su hoja de vida se filta por medio de la funcion buscarCoincidencias</p>");
+        "<p>" +
+        "<h2>/filtradoSkill</h2>" +
+        "Encontraras el array de mi hoja de vida y al final hay un clave con el nombre filtradoSkill con todos </p> <p> los skill de empleos y skill puestos en su hoja de vida se filta por medio de la funcion buscarCoincidencias</p>");
 
 })
 
 app.get('/filtradoSkill', (req, res) => {
 
 
+    /*SE ARMA ARRAY CON LAS HABILIDADES */
     function buscarCoincidencias(cvinfo) {
         const cvSkills = [
             ...cvinfo[0].skills.entries.map((entry) => entry.skill),
@@ -52,6 +53,7 @@ app.get('/filtradoSkill', (req, res) => {
 
     cvinfo[0].filtradoSkill = resultados
 
+    /* SE ENVIA LA INFORMACION */
     res.send(cvinfo);
 
 });
@@ -59,6 +61,7 @@ app.get('/filtradoSkill', (req, res) => {
 
 app.get('/api-offers/search', async (req, res) => {
 
+    // PARAMETROS DE BUSQUEDA
     const keyword = req.query.keyword || '';
     const normalizedJobTitleIds = req.query.normalizedJobTitleIds || '';
     const provinceIds = req.query.provinceIds || '';
@@ -76,20 +79,21 @@ app.get('/api-offers/search', async (req, res) => {
     const sinceDate = req.query.sinceDate || 'ANY'; // Valor predeterminado: ANY
     const subcategoryIds = req.query.subcategoryIds || '';
 
-    //console.log(keyword);
 
 
     try {
-
+        /* SE CONSULTAN LAS OFERTAS */
         const response = await fetch(`https://www.infojobs.net/webapp/offers/search?keyword=${keyword}&normalizedJobTitleIds=${normalizedJobTitleIds}&provinceIds=${provinceIds}&cityIds=${cityIds}&teleworkingIds=${teleworkingIds}&categoryIds=${categoryIds}&workdayIds=${workdayIds}&educationIds=${educationIds}&segmentId=${segmentId}&contractTypeIds=${contractTypeIds}&page=${page}&sortBy=${sortBy}&onlyForeignCountry=${onlyForeignCountry}&countryIds=${countryIds}&sinceDate=${sinceDate}&subcategoryIds=${subcategoryIds}`, requestOptions);
 
-        console.log(response);
+        // SE RETORNA SI SALE UN ERROR
         if (!response.ok) {
             throw new Error('Error en la petición');
         }
 
+        // SE COMBIERTE EN JSON LA DATA
         let data = await response.json();
 
+        /* SE CONSULTA LA API Y SE ARMA ARRAY CON LAS HABILIDADES */
         function buscarCoincidencias(cvinfo, offers) {
             const cvSkills = [
                 ...cvinfo[0].skills.entries.map((entry) => entry.skill),
@@ -103,7 +107,7 @@ app.get('/api-offers/search', async (req, res) => {
             });
             console.log(uniqueSkills);
 
-
+            /* SE COMPARA CADA EMPLEO CON LAS HABILIDADES DEL PERFIL */
             const updatedOffers = offers.map((offer) => {
                 const description = offer.description.toLowerCase();
                 let score = 0;
@@ -120,11 +124,13 @@ app.get('/api-offers/search', async (req, res) => {
             return updatedOffers
         }
 
-
+        //RETORNA EL ARRAY DE LAS OFERTAS CON CADA PUNTP
         const offers = buscarCoincidencias(cvinfo, data.offers);
+
+        // SE REMPLAZA LAS OFERTAS CON LAS OFERTAS CON PUNTUACION 
         data.offers = offers;
 
-
+        // SE ENVIA LAS INFORMACION
         res.status(200).send(data);
 
     } catch (error) {
